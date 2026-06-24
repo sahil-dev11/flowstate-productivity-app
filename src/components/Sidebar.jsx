@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Calendar, Flame, Target,
-  BarChart2, BookOpen, Settings, LogOut, Zap
+  BarChart2, Settings, LogOut, Zap
 } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 
@@ -12,7 +12,6 @@ const navItems = [
   { icon: Flame,           label: 'Habits',    to: '/habits' },
   { icon: Target,          label: 'Goals',     to: '/goals' },
   { icon: BarChart2,       label: 'Analytics', to: '/analytics' },
-  { icon: BookOpen,        label: 'Journal',   to: '/journal' },
 ]
 
 // Individual nav item — tracks its own hover state in React

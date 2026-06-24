@@ -11,7 +11,6 @@ import Planner from './pages/Planner'
 import Habits from './pages/Habits'
 import Goals from './pages/Goals'
 import Analytics from './pages/Analytics'
-import Journal from './pages/Journal'
 import Settings from './pages/Settings'
 
 function PrivateRoute() {
@@ -76,7 +75,6 @@ export default function App() {
           <Route path="/habits" element={<Habits />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/journal" element={<Journal />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

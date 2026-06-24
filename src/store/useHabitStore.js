@@ -129,6 +129,18 @@ export const useHabitStore = create(
         if (error) set({ error: error.message })
       },
 
+      deleteHabit: async (habitId) => {
+        // Optimistically remove from UI
+        set((state) => ({
+          habits: state.habits.filter(h => h.id !== habitId),
+          habitLogs: state.habitLogs.filter(l => l.habit_id !== habitId),
+        }))
+        // Delete logs first (foreign key), then the habit
+        await supabase.from('habit_logs').delete().eq('habit_id', habitId)
+        const { error } = await supabase.from('habits').delete().eq('id', habitId)
+        if (error) set({ error: error.message })
+      },
+
       getHabitStreak: (habitId) => {
         const { habitLogs } = get()
         const dates = habitLogs
