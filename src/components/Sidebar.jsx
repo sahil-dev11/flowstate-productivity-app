@@ -26,83 +26,111 @@ export default function Sidebar() {
     ? profile.full_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : 'U'
 
+  const W = expanded ? 220 : 68
+
   return (
     <aside
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className="fixed left-0 top-0 h-full z-50 flex flex-col overflow-hidden"
       style={{
-        width: expanded ? '220px' : '68px',
+        position: 'fixed', left: 0, top: 0, height: '100%', zIndex: 50,
+        display: 'flex', flexDirection: 'column',
+        width: `${W}px`,
         background: '#0B0D14',
         borderRight: '1px solid #1C1F2E',
         transition: 'width 0.28s cubic-bezier(0.4,0,0.2,1)',
+        overflow: 'hidden',
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 flex-shrink-0">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 14px', flexShrink: 0 }}>
         <div
-          className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center animate-pulse-lime"
-          style={{ background: '#C8FF00' }}
+          style={{
+            flexShrink: 0, width: '36px', height: '36px', borderRadius: '10px',
+            background: '#C8FF00', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 12px rgba(200,255,0,0.3)',
+          }}
         >
           <Zap size={18} style={{ color: '#0B0D14' }} strokeWidth={3} />
         </div>
-        <span
-          className="font-black text-white text-base whitespace-nowrap overflow-hidden transition-all duration-300"
-          style={{ opacity: expanded ? 1 : 0, maxWidth: expanded ? '160px' : '0px' }}
-        >
+        <span style={{
+          fontWeight: 900, color: '#F1F5F9', fontSize: '16px',
+          whiteSpace: 'nowrap', opacity: expanded ? 1 : 0,
+          transition: 'opacity 0.2s ease', pointerEvents: 'none',
+        }}>
           FlowState
         </span>
       </div>
 
-      {/* User pill */}
+      {/* User avatar */}
       {profile && (
-        <div className="mx-3 mb-5 flex-shrink-0">
-          <div className="flex items-center gap-2.5 rounded-xl overflow-hidden"
-            style={{ background: '#151721', padding: '8px 10px', border: '1px solid #2D3148' }}>
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black"
-              style={{ background: '#C8FF00', color: '#0B0D14' }}>
+        <div style={{ padding: '0 10px 12px', flexShrink: 0 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '8px', borderRadius: '12px',
+            background: '#151721', border: '1px solid #2D3148',
+          }}>
+            <div style={{
+              flexShrink: 0,
+              width: '32px', height: '32px', borderRadius: '9px',
+              background: '#C8FF00', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '12px', fontWeight: 900, color: '#0B0D14',
+            }}>
               {initials}
             </div>
-            <div className="overflow-hidden transition-all duration-300"
-              style={{ opacity: expanded ? 1 : 0, maxWidth: expanded ? '140px' : '0px' }}>
-              <p className="text-white text-xs font-bold whitespace-nowrap truncate">{profile.full_name || 'User'}</p>
-              <p className="text-xs whitespace-nowrap" style={{ color: '#34D399' }}>● Active</p>
+            <div style={{
+              overflow: 'hidden', whiteSpace: 'nowrap',
+              opacity: expanded ? 1 : 0, transition: 'opacity 0.15s ease',
+            }}>
+              <p style={{ fontSize: '12px', fontWeight: 700, color: '#F1F5F9' }}>
+                {profile.full_name || 'User'}
+              </p>
+              <p style={{ fontSize: '10px', color: '#34D399' }}>● Active</p>
             </div>
           </div>
         </div>
       )}
 
+      {/* Divider */}
+      <div style={{ height: '1px', background: '#1C1F2E', margin: '0 10px 8px', flexShrink: 0 }} />
+
       {/* Nav */}
-      <nav className="flex-1 px-2 flex flex-col gap-1 overflow-hidden">
+      <nav style={{ flex: 1, padding: '0 8px', display: 'flex', flexDirection: 'column', gap: '2px', overflowY: 'auto', overflowX: 'hidden' }}>
         {navItems.map(({ icon: Icon, label, to }) => (
           <NavLink
-            key={to} to={to} end={to === '/'}
-            className="flex items-center gap-3 rounded-xl transition-all duration-200 overflow-hidden"
+            key={to}
+            to={to}
+            end={to === '/'}
             style={({ isActive }) => ({
-              padding: '10px 12px',
+              display: 'flex', alignItems: 'center', gap: '10px',
+              padding: '9px 10px', borderRadius: '11px',
+              textDecoration: 'none',
               background: isActive ? '#C8FF00' : 'transparent',
+              transition: 'background 0.15s ease',
             })}
+            onMouseEnter={e => {
+              if (!e.currentTarget.style.background.includes('C8FF00'))
+                e.currentTarget.style.background = '#1C1F2E'
+            }}
+            onMouseLeave={e => {
+              if (!e.currentTarget.style.background.includes('C8FF00'))
+                e.currentTarget.style.background = 'transparent'
+            }}
           >
             {({ isActive }) => (
               <>
-                <div
-                  className="flex-shrink-0 w-5 h-5 flex items-center justify-center"
-                  style={{ filter: isActive ? 'none' : `drop-shadow(0 0 0 transparent)` }}
-                >
-                  <Icon
-                    size={18}
-                    strokeWidth={isActive ? 2.5 : 1.75}
-                    style={{ color: isActive ? '#0B0D14' : '#64748B' }}
-                  />
-                </div>
-                <span
-                  className="text-sm font-bold whitespace-nowrap overflow-hidden transition-all duration-300"
-                  style={{
-                    color: isActive ? '#0B0D14' : '#94A3B8',
-                    opacity: expanded ? 1 : 0,
-                    maxWidth: expanded ? '130px' : '0px',
-                  }}
-                >
+                <Icon
+                  size={18}
+                  strokeWidth={isActive ? 2.5 : 1.75}
+                  style={{ color: isActive ? '#0B0D14' : '#64748B', flexShrink: 0 }}
+                />
+                <span style={{
+                  fontSize: '13px', fontWeight: 700,
+                  color: isActive ? '#0B0D14' : '#94A3B8',
+                  whiteSpace: 'nowrap',
+                  opacity: expanded ? 1 : 0,
+                  transition: 'opacity 0.15s ease',
+                }}>
                   {label}
                 </span>
               </>
@@ -111,36 +139,53 @@ export default function Sidebar() {
         ))}
       </nav>
 
+      {/* Divider */}
+      <div style={{ height: '1px', background: '#1C1F2E', margin: '8px 10px', flexShrink: 0 }} />
+
       {/* Bottom */}
-      <div className="px-2 py-3 flex flex-col gap-1 flex-shrink-0"
-        style={{ borderTop: '1px solid #1C1F2E' }}>
-        <NavLink to="/settings"
-          className="flex items-center gap-3 rounded-xl transition-all duration-200 overflow-hidden"
+      <div style={{ padding: '0 8px 12px', display: 'flex', flexDirection: 'column', gap: '2px', flexShrink: 0 }}>
+        <NavLink
+          to="/settings"
           style={({ isActive }) => ({
-            padding: '10px 12px',
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '9px 10px', borderRadius: '11px',
+            textDecoration: 'none',
             background: isActive ? '#C8FF00' : 'transparent',
+            transition: 'background 0.15s ease',
           })}
         >
           {({ isActive }) => (
             <>
-              <Settings size={18} strokeWidth={1.75} style={{ color: isActive ? '#0B0D14' : '#64748B' }} />
-              <span className="text-sm font-bold whitespace-nowrap overflow-hidden transition-all duration-300"
-                style={{ color: isActive ? '#0B0D14' : '#94A3B8', opacity: expanded ? 1 : 0, maxWidth: expanded ? '130px' : '0px' }}>
+              <Settings size={18} strokeWidth={1.75}
+                style={{ color: isActive ? '#0B0D14' : '#64748B', flexShrink: 0 }} />
+              <span style={{
+                fontSize: '13px', fontWeight: 700,
+                color: isActive ? '#0B0D14' : '#94A3B8', whiteSpace: 'nowrap',
+                opacity: expanded ? 1 : 0, transition: 'opacity 0.15s ease',
+              }}>
                 Settings
               </span>
             </>
           )}
         </NavLink>
 
-        <button onClick={handleSignOut}
-          className="flex items-center gap-3 rounded-xl transition-all duration-200 overflow-hidden"
-          style={{ padding: '10px 12px' }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,113,113,0.08)'}
+        <button
+          onClick={handleSignOut}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '9px 10px', borderRadius: '11px',
+            background: 'transparent', border: 'none', cursor: 'pointer',
+            width: '100%', transition: 'background 0.15s ease',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,113,113,0.1)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <LogOut size={18} strokeWidth={1.75} style={{ color: '#F87171' }} />
-          <span className="text-sm font-bold whitespace-nowrap overflow-hidden transition-all duration-300"
-            style={{ color: '#F87171', opacity: expanded ? 1 : 0, maxWidth: expanded ? '130px' : '0px' }}>
+          <LogOut size={18} strokeWidth={1.75}
+            style={{ color: '#F87171', flexShrink: 0 }} />
+          <span style={{
+            fontSize: '13px', fontWeight: 700, color: '#F87171', whiteSpace: 'nowrap',
+            opacity: expanded ? 1 : 0, transition: 'opacity 0.15s ease',
+          }}>
             Sign Out
           </span>
         </button>
