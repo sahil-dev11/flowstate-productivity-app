@@ -20,9 +20,18 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault(); setError(''); setSuccess(''); setLoading(true)
     if (mode === 'signup') {
-      const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } })
-      if (error) setError(error.message)
-      else setSuccess('Account created! Check your email to confirm.')
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { full_name: name } }
+      })
+      if (error) {
+        setError(error.message)
+      } else if (data?.session) {
+        // Email confirmation is OFF — user is logged in immediately, router will redirect
+      } else {
+        // Email confirmation is ON — ask them to check inbox
+        setSuccess('Account created! Check your email to confirm.')
+      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) setError(error.message)
