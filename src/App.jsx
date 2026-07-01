@@ -12,6 +12,7 @@ import Habits from './pages/Habits'
 import Goals from './pages/Goals'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
+import Challenge from './pages/Challenge'
 
 function PrivateRoute() {
   const { user, loading } = useAuthStore()
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/planner" element={<Planner />} />
           <Route path="/habits" element={<Habits />} />
           <Route path="/goals" element={<Goals />} />
+          <Route path="/challenge" element={<Challenge />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
         </Route>

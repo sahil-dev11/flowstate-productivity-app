@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, Flame, Target, Smile, TrendingUp, Clock } from 'lucide-react'
+import { CheckSquare, Flame, Target, TrendingUp, Clock, Zap } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useTaskStore } from '../store/useTaskStore'
 import { useHabitStore } from '../store/useHabitStore'
 import { useGoalStore } from '../store/useGoalStore'
-import { useJournalStore } from '../store/useJournalStore'
 import StatsCard from '../components/StatsCard'
 import TaskBlock from '../components/TaskBlock'
 import HabitCard from '../components/HabitCard'
-import MoodPicker from '../components/MoodPicker'
 
 const QUOTES = [
   { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" },
@@ -31,11 +29,9 @@ export default function Dashboard() {
   const { fetchTasks, getTasksForDate, getTodayStats } = useTaskStore()
   const { fetchHabits, fetchHabitLogs, habits, isCompletedToday, getHabitStreak } = useHabitStore()
   const { fetchGoals, getActiveGoals } = useGoalStore()
-  const { saveEntry, getEntryForDate, fetchEntries } = useJournalStore()
 
   const today = new Date().toISOString().split('T')[0]
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], [])
-  const [mood, setMood] = useState(null)
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
@@ -49,14 +45,8 @@ export default function Dashboard() {
       fetchHabits(user.id)
       fetchHabitLogs(user.id)
       fetchGoals(user.id)
-      fetchEntries(user.id)
     }
   }, [user, today])
-
-  useEffect(() => {
-    const e = getEntryForDate(today)
-    if (e?.mood) setMood(e.mood)
-  }, [today])
 
   const todayTasks = getTasksForDate(today)
   const { total: totalTasks, completed: completedTasks } = getTodayStats(today)
@@ -64,12 +54,6 @@ export default function Dashboard() {
   const activeHabits = habits.filter(h => !h.archived)
   const doneHabits = activeHabits.filter(h => isCompletedToday(h.id)).length
   const maxStreak = useMemo(() => habits.reduce((m, h) => Math.max(m, getHabitStreak(h.id)), 0), [habits])
-
-  const handleMoodChange = async (val) => {
-    setMood(val)
-    const entry = getEntryForDate(today) || {}
-    await saveEntry(user.id, { ...entry, entry_date: today, mood: val })
-  }
 
   const firstName = profile?.full_name?.split(' ')[0] || 'there'
   const taskPct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
@@ -168,19 +152,7 @@ export default function Dashboard() {
         {/* Right column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-          {/* Mood */}
-          <div className="card">
-            <h2 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Smile size={16} style={{ color: '#A78BFA' }} strokeWidth={2.5} />
-              Vibe Check
-            </h2>
-            <MoodPicker value={mood} onChange={handleMoodChange} />
-            {mood && (
-              <p style={{ fontSize: '11px', fontWeight: 600, color: '#34D399', marginTop: '10px' }}>● Mood saved</p>
-            )}
-          </div>
-
-          {/* Quote */}
+          {/* Spark of the Day */}
           <div style={{
             borderRadius: '16px', padding: '20px', position: 'relative', overflow: 'hidden',
             background: 'linear-gradient(135deg, #1C1F2E 0%, #151721 100%)',
@@ -190,8 +162,9 @@ export default function Dashboard() {
               position: 'absolute', top: '-30px', right: '-30px', width: '100px', height: '100px',
               borderRadius: '50%', background: 'radial-gradient(circle, rgba(200,255,0,0.12) 0%, transparent 70%)',
             }} />
-            <p style={{ fontSize: '10px', fontWeight: 800, color: '#C8FF00', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-              ⚡ Daily Fuel
+            <p style={{ fontSize: '10px', fontWeight: 800, color: '#C8FF00', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Zap size={11} strokeWidth={2.5} style={{ color: '#C8FF00' }} />
+              Spark of the Day
             </p>
             <blockquote style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', lineHeight: 1.6, fontStyle: 'italic' }}>
               "{quote.text}"

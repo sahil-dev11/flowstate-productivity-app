@@ -1,13 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis,
+  BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
-import { BarChart2, Flame, Smile, CheckSquare } from 'lucide-react'
+import { BarChart2, Flame, CheckSquare } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useHabitStore } from '../store/useHabitStore'
 import { useTaskStore } from '../store/useTaskStore'
-import { useJournalStore } from '../store/useJournalStore'
 
 const TT = {
   contentStyle: { background: '#1C1F2E', border: '1px solid #2D3148', borderRadius: '10px', color: '#F1F5F9', fontSize: '12px', fontWeight: 600 },
@@ -21,11 +20,11 @@ export default function Analytics() {
   const { user } = useAuthStore()
   const { fetchHabits, fetchHabitLogs, habits, habitLogs, getHabitStreak } = useHabitStore()
   const { fetchTasksRange, tasks } = useTaskStore()
-  const { fetchEntries, getMoodHistory } = useJournalStore()
 
   useEffect(() => {
     if (user) {
-      fetchHabits(user.id); fetchHabitLogs(user.id); fetchEntries(user.id)
+      fetchHabits(user.id)
+      fetchHabitLogs(user.id)
       const days = getLast14Days()
       fetchTasksRange(user.id, days[0], days[days.length - 1])
     }
@@ -42,11 +41,6 @@ export default function Analytics() {
     }
     return { label: ws.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), rate: total > 0 ? Math.round((done / total) * 100) : 0 }
   }), [habits, habitLogs])
-
-  const moodData = useMemo(() => getMoodHistory(30).map(e => ({
-    date: new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    mood: e.mood,
-  })), [getMoodHistory])
 
   const taskData = useMemo(() => getLast14Days().map(ds => {
     const day = tasks.filter(t => t.scheduled_date === ds)
@@ -100,23 +94,6 @@ export default function Analytics() {
           </ResponsiveContainer>
         </div>
 
-        {/* Mood */}
-        <div className="card">
-          <ChartHeader icon={Smile} color="#A78BFA" title="Mood Trend" sub="Last 30 days" />
-          <ResponsiveContainer width="100%" height={210}>
-            <LineChart data={moodData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2D3148" vertical={false} />
-              <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 10, fontWeight: 600 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} domain={[1,5]} ticks={[1,2,3,4,5]} />
-              <Tooltip contentStyle={{ background: '#1C1F2E', border: '1px solid #2D3148', borderRadius: '10px', color: '#F1F5F9', fontSize: '12px' }}
-                cursor={{ stroke: '#A78BFA', strokeWidth: 1 }} formatter={v => [v, 'Mood']} />
-              <Line type="monotone" dataKey="mood" stroke="#A78BFA" strokeWidth={2.5}
-                dot={{ fill: '#A78BFA', r: 3, strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: '#C8FF00', strokeWidth: 0 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
         {/* Tasks */}
         <div className="card">
           <ChartHeader icon={CheckSquare} color="#34D399" title="Tasks Completed" sub="Last 14 days" />
@@ -132,15 +109,15 @@ export default function Analytics() {
           </ResponsiveContainer>
         </div>
 
-        {/* Streak board */}
-        <div className="card">
+        {/* Streak board — full width */}
+        <div className="card" style={{ gridColumn: '1 / -1' }}>
           <ChartHeader icon={Flame} color="#C8FF00" title="Streak Leaderboard" sub="Top habits by streak" />
           {streaks.length === 0 ? (
             <p style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
               Complete habits to build streaks!
             </p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px 40px' }}>
               {streaks.map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{

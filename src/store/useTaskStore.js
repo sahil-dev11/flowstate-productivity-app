@@ -84,6 +84,23 @@ export const useTaskStore = create(
         }
       },
 
+      updateTask: async (taskId, updates) => {
+        const prev = get().tasks.find(t => t.id === taskId)
+        set((state) => ({
+          tasks: state.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t)
+        }))
+        const { error } = await supabase
+          .from('tasks')
+          .update(updates)
+          .eq('id', taskId)
+        if (error) {
+          set((state) => ({
+            tasks: state.tasks.map(t => t.id === taskId ? prev : t),
+            error: error.message
+          }))
+        }
+      },
+
       getTasksForDate: (dateStr) => {
         return get().tasks.filter(t => t.scheduled_date === dateStr)
       },
